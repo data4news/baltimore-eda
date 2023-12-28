@@ -1,0 +1,184 @@
+---
+title: "Baltimore EDA Homework"
+format: html
+editor: visual
+---
+
+## Introduction
+
+Hello and welcome to Frontiers of Computational Journalism with Dhrumil Mehta and Nick Thieme! We're excited to work with you this year.
+
+This is the first assignment of the class, and the goal is to both get a sense of how you think about telling stories off of data and to get you introduced a bit to Baltimore, which will play a surprisingly large role in this class (Nick is a data journalist in Baltimore).
+
+## Assignment
+
+We're asking you to produce a chart and 3 separate insights in sentence form about Baltimore's demographics, geography, or socioeconomic conditions (your choice), and based on its responses to the American Community Survey (ACS). There will be space later on in the notebook for all the deliverables.
+
+Basically, we want you to conduct exploratory data analysis (EDA) on ACS data about Baltimore, and tell us what you find, and what a potential reporting direction based on this could be.
+
+This doesn't have to be anything ground-breaking, and may not actually lead to anything. But it will get you a little acquainted with the city, and will get us a little acquainted with your thinking.
+
+## First steps
+
+Before you do any data analysis, spend an hour or two reading about Baltimore. You may not be familiar with the city beyond the show The Wire, and having a sense of "what the city's like" will help direct the questions you try to answer with the ACS.
+
+Please take this step seriously. You will hear this from us over and over this semester, but the act of choosing a story is as important to the process of data journalism as any other step.
+
+Possible places to look are:
+
+[Baltimore Magazine's 2023 Year in Review](https://www.baltimoremagazine.com/section/community/baltimore-year-in-review-2023-twenty-most-pivotal-moments/)
+
+[The Baltimore Banner's analysis of Poll data on Baltimore's opinions](https://www.thebaltimorebanner.com/data/what-the-baltimore-now-poll-tells-us-about-how-city-residents-share-opinions-D7RRBHADDNFZ7K54FQYM7H2YNY/)
+
+But you'll be best served finding something yourself.
+
+As you're reading, take notes in the notes section below. Just a few sentences is fine, we want to get a sense of what catches your interest.
+
+### Notes
+
+## Code
+
+We've set this notebook up in Quarto, so both R and Python will work here.
+
+We're reading in Census data using the fantastic `get_acs` function in the `tidycensus` package and converting it into Python (under the hood) using the `reticulate` package. I'm learning Quarto alongside you, so this is a bit of an experiment.
+
+To download data through `get_acs`, you'll need to set up an API key (very easy), so if you haven't used it before please follow the instructions under heading **2.1** [here](https://walker-data.com/census-r/an-introduction-to-tidycensus.html).
+
+### R library
+
+We have the code set so you will already be pulling in ACS tract-level data for Baltimore. For every tract in the city, you're getting the median income, the number of white residents, the number of Black residnts, the number of residents in poverty, and the total number of residents. In addition, the D_acs_r object contains a shapefile of the Census tracts in the city.
+
+There is space in the code below for you to go find and add four more ACS variables based on what you may be interested in.
+
+[Census Reporter](https://censusreporter.org/) is a great place to find those variables.
+
+Replace the code `#insert new variable` with the corresponding Census table you found on Census reporter. If you're struggling to find the exact number you need, the Census Data API has a very long list [here](https://api.census.gov/data/2020/acs/acs5/variables.html).
+
+```{r}
+#| output: false
+require(tidyverse)
+require(tidycensus)
+require(viridis)
+require(reticulate)
+require(ggthemes)
+
+D_acs_r<-get_acs(geography = "tract", 
+                   state = "MD",
+                   county = "Baltimore city",
+                   variables=c(
+                     med_inc="B19013_001",
+                     white = "B02001_002",
+                     black = "B02001_003", 
+                     poverty = "B17001_002"
+                     #insert new variable,
+                     #insert new variable,
+                     #insert new variable,
+                     #insert new variable
+                     ),
+                   geometry = T, 
+                   summary_var = "B01001_001"
+                   )
+
+D_acs_py_tmp<-r_to_py(D_acs_r)
+
+D_acs_r<-D_acs_r %>% 
+  select(-moe, -summary_moe) %>% 
+  pivot_wider(names_from = "variable", values_from = "estimate")
+```
+
+### Python library
+
+This code converts the R sf object above into a Geopandas object in Python, in case you prefer to work in Python. Note: I did not know how to do this myself, and used GPT-4 for the code.
+
+```{python}
+import pandas as pd
+from shapely.geometry import Polygon, MultiPolygon
+import geopandas as gpd
+
+def convert_to_multipolygon(coord_lists):
+    # This function converts nested lists of coordinates to a MultiPolygon
+    multipolygons = []
+    for polygon_coords in coord_lists:
+        # Each element in coord_lists is a list of linear rings (first is exterior, others are holes)
+        exterior = polygon_coords[0]
+        interiors = polygon_coords[1:] if len(polygon_coords) > 1 else []
+        polygon = Polygon(exterior, interiors)
+        multipolygons.append(polygon)
+    return MultiPolygon(multipolygons)
+  
+r.D_acs_py_tmp['geometry'] = r.D_acs_py_tmp['geometry'].apply(convert_to_multipolygon)
+D_acs_py = gpd.GeoDataFrame(r.D_acs_py_tmp, geometry='geometry')
+```
+
+### Example EDA
+
+Here are two sample charts to get you started. These display what are commonly known as "The Black Butterfly" and the "White L." These are the names Morgan State University professor Lawrence Brown gave to areas in the city that are majority Black and majority white, given the great number of socioeconomic factors that vary in these different areas.
+
+You can see the incredible geographic segregation in Baltimore in the choropleth map below. All the majority Black tracts in the city are in the wings of the butterfly, while the majority white rates are in the L. 
+
+```{r}
+D_acs_r %>% 
+  mutate(blk_perc = black/summary_est*100) %>% 
+  ggplot(aes(color = blk_perc, fill = blk_perc))+
+  geom_sf()+
+  scale_color_viridis()+
+  scale_fill_viridis()+
+  labs(title = "Black Butterfly visible are bright yellow \"wings\" on map", 
+       color = "Black %",
+       fill = "Black %")+
+  theme_map()
+```
+
+The areas of the city that are above and below Baltimore's median income level are roughly the same as the minority and majority Black areas in the city, but not exactly. Most notably, the northeast quadrant of the city contains new neighborhoods that were draws for wealthier Black families.
+
+```{r}
+cuts = c(0,52000,250000)
+
+D_acs_r_2<-D_acs_r %>% 
+    mutate(inc_cut = cut(med_inc, cuts))
+
+D_acs_r_2$inc_cut<-ifelse(D_acs_r_2$inc_cut=="(0,5.2e+04]",
+                          "Below median income", 
+                          "Above median income")
+
+
+D_acs_r_2%>% 
+    ggplot(aes(color = inc_cut, fill = inc_cut))+
+    geom_sf()+
+  labs(title = "Black Butterfly visible in median income rates across the city",
+       color = "Median income",
+       fill = "Median income")+
+  scale_color_viridis(discrete = T, option ="E")+
+  scale_fill_viridis(discrete =T, option="E")+
+  theme_map()
+```
+
+
+### Your code
+
+Now, it's your turn.
+
+#### First EDA sentence
+
+```{r}
+
+```
+
+#### Second EDA sentence
+
+```{r}
+
+```
+
+#### Third EDA sentence
+
+```{r}
+
+```
+
+#### Chart
+
+```{r}
+
+```
+
