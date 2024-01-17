@@ -8,7 +8,7 @@ editor: visual
 
 Hello and welcome to Frontiers of Computational Journalism with Dhrumil Mehta and Nick Thieme! We're excited to work with you this year.
 
-This is the first assignment of the class, and the goal is to both get a sense of how you think about telling stories off of data and to get you introduced a bit to Baltimore, which will play a surprisingly large role in this class (Nick is a data journalist in Baltimore).
+This is the first assignment of the class, and the goal is to both get a sense of how you think about telling stories off of data and to get you introduced a bit to Baltimore, which will be the focus of our first assignment (Nick is a data journalist in Baltimore).
 
 ## Assignment
 
@@ -18,7 +18,7 @@ Basically, we want you to conduct exploratory data analysis (EDA) on ACS data ab
 
 This doesn't have to be anything ground-breaking, and may not actually lead to anything. But it will get you a little acquainted with the city, and will get us a little acquainted with your thinking.
 
-## First steps
+## [Step 1: Reading]{.underline}
 
 Before you do any data analysis, spend an hour or two reading about Baltimore. You may not be familiar with the city beyond the show The Wire, and having a sense of "what the city's like" will help direct the questions you try to answer with the ACS.
 
@@ -34,7 +34,13 @@ But you'll be best served finding something yourself.
 
 As you're reading, take notes in the notes section below. Just a few sentences is fine, we want to get a sense of what catches your interest.
 
-### Notes
+---
+
+Todo:
+
+👉 spend an hour or two reading about Baltimore
+
+## [**Step 2: Setup**]{.underline}
 
 ## Code
 
@@ -46,7 +52,7 @@ To download data through `get_acs`, you'll need to set up an API key (very easy)
 
 ### R library
 
-We have the code set so you will already be pulling in ACS tract-level data for Baltimore. For every tract in the city, you're getting the median income, the number of white residents, the number of Black residnts, the number of residents in poverty, and the total number of residents. In addition, the D_acs_r object contains a shapefile of the Census tracts in the city.
+We have the code set so you will already be pulling in ACS tract-level data for Baltimore. For every tract in the city, you're getting the median income, the number of white residents, the number of Black residents, the number of residents in poverty, and the total number of residents. In addition, the D_acs_r object contains a shapefile of the Census tracts in the city.
 
 There is space in the code below for you to go find and add four more ACS variables based on what you may be interested in.
 
@@ -110,11 +116,19 @@ r.D_acs_py_tmp['geometry'] = r.D_acs_py_tmp['geometry'].apply(convert_to_multipo
 D_acs_py = gpd.GeoDataFrame(r.D_acs_py_tmp, geometry='geometry')
 ```
 
-### Example EDA
+---
+
+Todo:
+
+👉 Get the quarto notebook setup and running. Run the example code snippets in R and Python
+
+👉 Spend some time in [CensusReporter](https://censusreporter.org/). Identify a few other Census variables you'd like to dive into and insert them in the code above.
+
+### [**Step 3: Guided EDA**]{.underline}
 
 Here are two sample charts to get you started. These display what are commonly known as "The Black Butterfly" and the "White L." These are the names Morgan State University professor Lawrence Brown gave to areas in the city that are majority Black and majority white, given the great number of socioeconomic factors that vary in these different areas.
 
-You can see the incredible geographic segregation in Baltimore in the choropleth map below. All the majority Black tracts in the city are in the wings of the butterfly, while the majority white rates are in the L. 
+You can see the incredible geographic segregation in Baltimore in the choropleth map below. All the majority Black tracts in the city are in the wings of the butterfly, while the majority white rates are in the L.
 
 ```{r}
 D_acs_r %>% 
@@ -141,44 +155,49 @@ D_acs_r_2$inc_cut<-ifelse(D_acs_r_2$inc_cut=="(0,5.2e+04]",
                           "Below median income", 
                           "Above median income")
 
-
 D_acs_r_2%>% 
     ggplot(aes(color = inc_cut, fill = inc_cut))+
-    geom_sf()+
-  labs(title = "Black Butterfly visible in median income rates across the city",
+    geom_sf() +
+  labs(title = "TKTK Fill in Title",
        color = "Median income",
        fill = "Median income")+
   scale_color_viridis(discrete = T, option ="E")+
-  scale_fill_viridis(discrete =T, option="E")+
+  scale_fill_viridis(discrete = T, option="E")+
   theme_map()
 ```
 
+---
 
-### Your code
+Todo:
+
+👉 Write a title for the chart that the code snippet above renders. The title should summarize your finding or main idea. Write a few sentences about what you see. Since this is exploratory data analysis, imagine the intended audience is internal to the newsroom (your editor, your colleagues, yourself six months from now).
+
+👉 What other census variables can you see the Black Butterfly or White L in?
+
+## [Step 4: Your EDA]{.underline}
 
 Now, it's your turn.
 
-#### First EDA sentence
+#### First observation/question
 
 ```{r}
 
 ```
 
-#### Second EDA sentence
+#### Second observation/question
 
 ```{r}
 
 ```
 
-#### Third EDA sentence
+#### Third observation/question
 
 ```{r}
 
 ```
 
-#### Chart
+---
 
-```{r}
+Todo:
 
-```
-
+👉 Produce at least three observations or questions based on what you find as you explore. Feel free to include code, charts, sentences, whatever you feel is needed to articulate your observation or question.
