@@ -4,7 +4,7 @@ Hello and welcome to Frontiers of Computational Journalism with Dhrumil Mehta an
 
 This is the first assignment of the class, and the goal is to both get a sense of how you think about telling stories off of data and to get you introduced a bit to Baltimore, which will be the focus of our first assignment (Nick is a data journalist in Baltimore).
 
-To get started, please clone this repository and follow the steps in `eda_notebook.qmd`. If you don't already have Quarto installed, please follow the steps below. See you soon! 
+To get started, please clone this repository and follow the steps in `eda_notebook.qmd` ([rendered here](https://data4news.com/baltimore-eda/eda_notebook.html)). If you don't already have Quarto installed, please follow the steps below. See you soon! 
 
 # Setup
 
