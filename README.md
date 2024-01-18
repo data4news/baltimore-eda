@@ -1,40 +1,15 @@
-# Jupyter Quickstart
+# quarto-quickstart
 
-A Jupyter notebook that mixes Python3 and R.
+Python + R notebook using [Quarto](https://quarto.org/docs/get-started/)!
 
-## Example Notebook
+Please see the installation guide here: https://quarto.org/docs/get-started/
 
-https://nbviewer.jupyter.org/github/dmil/jupyter-quickstart/blob/master/notebook.ipynb
+Example notebook: http://dhrumilmehta.com/quarto-quickstart
 
-## Requirements
+## Installation
 
-* Homebrew
-* Python 3
+This setup only works if Python was installed with the `--enable-shared` option. I had to first uninstall python adn then re-install it with the `--enable-shared` option. Since I use pyenv, I installed it as follows:
 
-## Quickstart
-
-1. Install some packages with [HomeBrew](https://brew.sh/)
-
-    ```bash
-    brew install r
-    brew install libgit2
-    ```
-  
-2. Clone the repo and `cd` into the folder you cloned
-
-3. Install R and python packages
-
-    ```bash
-    RScript setup.R
-    pip3 install -r requirements.txt
-    ```
-  
-4. Open the jupyter notebook
-
-    ```bash
-    jupyter notebook notebook.ipynb
-    ```
-
-## Additional steps for FiveThirtyEight Writers
-
-See additional setup instructions inside `setup-fte.R`.
+```
+env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.11.2
+```
